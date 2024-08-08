@@ -219,7 +219,7 @@ function GoogleSignInButton() {
             <Loader className="w-5 h-5" />
           </span>
         ) : (
-          "Sign in with GOOGLE"
+          "Sign in with Google"
         )}
       </span>
     </button>
