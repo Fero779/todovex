@@ -124,6 +124,7 @@ export default function SideBar() {
       </div>
       <div className="mt-auto p-4">
         <Card x-chunk="dashboard-02-chunk-0">
+        {/* hsdkfhsdk */}
           <CardHeader className="p-2 pt-0 md:p-4">
             <CardTitle>Upgrade to Pro</CardTitle>
             <CardDescription>
