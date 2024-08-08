@@ -4,8 +4,9 @@ import { ConvexProviderWithAuth, ConvexReactClient } from "convex/react";
 import { Session } from "next-auth";
 import { SessionProvider, useSession } from "next-auth/react";
 
-interface ExtendedSession extends Session {
-  convexToken?: string; // Marking it as optional
+// Define the ExtendedSession interface that includes the optional convexToken
+interface ExtendedSession extends Omit<Session, "convexToken"> {
+  convexToken?: string;
 }
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
