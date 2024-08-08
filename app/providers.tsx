@@ -1,13 +1,13 @@
 "use client";
 import { ReactNode, useMemo } from "react";
 import { ConvexProviderWithAuth, ConvexReactClient } from "convex/react";
-import { Session } from "next-auth";
 import { SessionProvider, useSession } from "next-auth/react";
+import { Session as NextAuthSession } from "next-auth"; // Import Session from next-auth
 
-// Define the ExtendedSession interface that includes the optional convexToken
-interface ExtendedSession extends Omit<Session, "convexToken"> {
+// Define a new type that includes the properties of NextAuthSession and convexToken
+type ExtendedSession = NextAuthSession & {
   convexToken?: string;
-}
+};
 
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
@@ -16,9 +16,9 @@ function convexTokenFromSession(session: ExtendedSession | null): string | null 
 }
 
 function useAuth() {
-  const { data: session, update } = useSession<ExtendedSession>();
+  const { data: session, update } = useSession();
 
-  const convexToken = convexTokenFromSession(session);
+  const convexToken = convexTokenFromSession(session as ExtendedSession | null);
   return useMemo(
     () => ({
       isLoading: false,
@@ -30,16 +30,12 @@ function useAuth() {
       }) => {
         if (forceRefreshToken) {
           const updatedSession = await update();
-
           return convexTokenFromSession(updatedSession as ExtendedSession);
         }
         return convexToken;
       },
     }),
-    // We only care about the user changes, and don't want to
-    // bust the memo when we fetch a new token.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [JSON.stringify(session?.user)]
+    [JSON.stringify(session?.user)] // Memoize based on session user
   );
 }
 
