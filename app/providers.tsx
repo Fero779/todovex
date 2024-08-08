@@ -4,14 +4,18 @@ import { ConvexProviderWithAuth, ConvexReactClient } from "convex/react";
 import { Session } from "next-auth";
 import { SessionProvider, useSession } from "next-auth/react";
 
+interface ExtendedSession extends Session {
+  convexToken?: string; // Marking it as optional
+}
+
 const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
 
-function convexTokenFromSession(session: Session | null): string | null {
+function convexTokenFromSession(session: ExtendedSession | null): string | null {
   return session?.convexToken ?? null;
 }
 
 function useAuth() {
-  const { data: session, update } = useSession();
+  const { data: session, update } = useSession<ExtendedSession>();
 
   const convexToken = convexTokenFromSession(session);
   return useMemo(
@@ -24,9 +28,9 @@ function useAuth() {
         forceRefreshToken: boolean;
       }) => {
         if (forceRefreshToken) {
-          const session = await update();
+          const updatedSession = await update();
 
-          return convexTokenFromSession(session);
+          return convexTokenFromSession(updatedSession as ExtendedSession);
         }
         return convexToken;
       },
@@ -43,7 +47,7 @@ export default function Providers({
   session,
 }: {
   children: ReactNode;
-  session: Session | null;
+  session: ExtendedSession | null;
 }) {
   return (
     <SessionProvider session={session}>
